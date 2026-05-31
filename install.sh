@@ -52,6 +52,7 @@ CODEX_RUNNER_DEFAULT_OUTPUT_DIR=$default_output_dir
 CODEX_RUNNER_SANDBOX=workspace-write
 CODEX_RUNNER_TIMEOUT_SECONDS=900
 CODEX_RUNNER_SEARCH=false
+CODEX_RUNNER_PROXY=
 
 # Optional: pin a Codex model. Leave empty to use your Codex default.
 CODEX_RUNNER_MODEL=
@@ -62,6 +63,9 @@ else
   fi
   if ! grep -q '^CODEX_RUNNER_DEFAULT_OUTPUT_DIR=' "$config_file"; then
     printf 'CODEX_RUNNER_DEFAULT_OUTPUT_DIR=%s\n' "$default_output_dir" >> "$config_file"
+  fi
+  if ! grep -q '^CODEX_RUNNER_PROXY=' "$config_file"; then
+    printf 'CODEX_RUNNER_PROXY=\n' >> "$config_file"
   fi
 fi
 

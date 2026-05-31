@@ -18,6 +18,7 @@ const approval = process.env.CODEX_RUNNER_APPROVAL || 'never';
 const timeoutSeconds = Number.parseInt(process.env.CODEX_RUNNER_TIMEOUT_SECONDS || '900', 10);
 const model = process.env.CODEX_RUNNER_MODEL || '';
 const useSearch = truthy(process.env.CODEX_RUNNER_SEARCH);
+const proxy = process.env.CODEX_RUNNER_PROXY || '';
 const codexExecHelp = await getCodexExecHelp();
 
 if (process.argv.includes('--print-config')) {
@@ -30,6 +31,7 @@ if (process.argv.includes('--print-config')) {
     timeoutSeconds,
     model,
     search: useSearch,
+    proxy,
     configFile: process.env.CODEX_RUNNER_CONFIG || defaultConfig,
   }, null, 2));
   process.exit(0);
@@ -82,6 +84,7 @@ log.write(`# OpenClaw Codex Bridge\n`);
 log.write(`# Started: ${new Date().toISOString()}\n`);
 log.write(`# Workspace: ${workspace}\n`);
 log.write(`# Default output dir: ${defaultOutputDir}\n`);
+if (proxy) log.write(`# Proxy: ${proxy}\n`);
 log.write(`# Command: ${codexBin} ${args.join(' ')}\n\n`);
 
 const codexPrompt = [
@@ -103,7 +106,7 @@ const codexPrompt = [
 
 const child = spawn(codexBin, args, {
   cwd: workspace,
-  env: { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' },
+  env: buildChildEnv(),
   stdio: ['pipe', 'pipe', 'pipe'],
 });
 
@@ -192,6 +195,21 @@ async function getCodexExecHelp() {
     child.on('error', () => resolve(''));
     child.on('close', () => resolve(Buffer.concat(chunks).toString('utf8')));
   });
+}
+
+function buildChildEnv() {
+  const env = { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' };
+  if (proxy) {
+    env.HTTP_PROXY = proxy;
+    env.HTTPS_PROXY = proxy;
+    env.ALL_PROXY = proxy;
+    env.http_proxy = proxy;
+    env.https_proxy = proxy;
+    env.all_proxy = proxy;
+    env.NO_PROXY = env.NO_PROXY || '127.0.0.1,localhost';
+    env.no_proxy = env.no_proxy || env.NO_PROXY;
+  }
+  return env;
 }
 
 function truthy(value) {

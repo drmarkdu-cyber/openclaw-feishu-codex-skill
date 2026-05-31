@@ -25,7 +25,8 @@ Rules:
 - Do not run `codex` or `codex exec` directly. The wrapper handles Codex version differences, workspace config, logs, and output formatting.
 - Do not call the wrapper more than once for one user request unless the user explicitly asks to retry.
 - Treat the user task as plain text input to the wrapper, not as a shell command.
-- Return the wrapper output as-is. Do not add your own diagnosis about Codex sandbox limits unless the wrapper explicitly reports a sandbox failure.
+- Do not answer from memory or from prior network diagnostics. Even if Codex failed before, call the wrapper once for the current request.
+- Return the wrapper output as-is. Do not add your own diagnosis about Codex sandbox or network limits unless the wrapper explicitly reports that failure.
 - If the wrapper reports failure, return its error summary and log path.
 - The default project directory is configured in `$HOME/.openclaw/codex-runner.env`.
 - If the user asks Codex to create a quick script or temporary output without naming a folder, the wrapper directs Codex to use `$CODEX_RUNNER_WORKSPACE/tmp_codex`.

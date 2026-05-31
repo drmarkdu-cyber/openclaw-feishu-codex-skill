@@ -95,6 +95,7 @@ CODEX_RUNNER_DEFAULT_OUTPUT_DIR=$HOME/Documents/Codex/codex-work/tmp_codex
 CODEX_RUNNER_SANDBOX=workspace-write
 CODEX_RUNNER_TIMEOUT_SECONDS=900
 CODEX_RUNNER_SEARCH=false
+CODEX_RUNNER_PROXY=
 CODEX_RUNNER_MODEL=
 ```
 
@@ -103,6 +104,12 @@ CODEX_RUNNER_MODEL=
 ```bash
 CODEX_RUNNER_WORKSPACE=/path/to/your/project
 CODEX_RUNNER_DEFAULT_OUTPUT_DIR=/path/to/your/project/tmp_codex
+```
+
+如果本机需要代理才能访问 Codex/OpenAI 后端，可以设置：
+
+```bash
+CODEX_RUNNER_PROXY=http://127.0.0.1:7890
 ```
 
 ## 验证
