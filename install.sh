@@ -35,8 +35,9 @@ workspace="${OPENCLAW_WORKSPACE:-$openclaw_home/workspace}"
 skill_dir="$workspace/skills/codex"
 config_file="${CODEX_RUNNER_CONFIG:-$openclaw_home/codex-runner.env}"
 default_codex_workspace="${CODEX_RUNNER_WORKSPACE:-$HOME/Documents/Codex/codex-work}"
+default_output_dir="${CODEX_RUNNER_DEFAULT_OUTPUT_DIR:-$default_codex_workspace/tmp_codex}"
 
-mkdir -p "$workspace/skills" "$openclaw_home/codex-runs" "$default_codex_workspace"
+mkdir -p "$workspace/skills" "$openclaw_home/codex-runs" "$default_codex_workspace" "$default_output_dir"
 rm -rf "$skill_dir"
 cp -R "$source_dir/skills/codex" "$skill_dir"
 chmod +x "$skill_dir/scripts/codex-runner.mjs"
@@ -45,6 +46,7 @@ if [ ! -f "$config_file" ]; then
   cat > "$config_file" <<EOF
 # Default project directory for Feishu/OpenClaw /codex tasks.
 CODEX_RUNNER_WORKSPACE=$default_codex_workspace
+CODEX_RUNNER_DEFAULT_OUTPUT_DIR=$default_output_dir
 
 # Codex safety/runtime defaults.
 CODEX_RUNNER_SANDBOX=workspace-write
@@ -57,6 +59,9 @@ EOF
 else
   if ! grep -q '^CODEX_RUNNER_WORKSPACE=' "$config_file"; then
     printf '\nCODEX_RUNNER_WORKSPACE=%s\n' "$default_codex_workspace" >> "$config_file"
+  fi
+  if ! grep -q '^CODEX_RUNNER_DEFAULT_OUTPUT_DIR=' "$config_file"; then
+    printf 'CODEX_RUNNER_DEFAULT_OUTPUT_DIR=%s\n' "$default_output_dir" >> "$config_file"
   fi
 fi
 
@@ -72,6 +77,7 @@ echo "Installed OpenClaw /codex skill."
 echo "Skill: $skill_dir"
 echo "Config: $config_file"
 echo "Default workspace: $default_codex_workspace"
+echo "Default output dir: $default_output_dir"
 echo
 echo "Test in Feishu/OpenClaw:"
 echo '  /codex 请只回复：OpenClaw 已成功调用 Codex'

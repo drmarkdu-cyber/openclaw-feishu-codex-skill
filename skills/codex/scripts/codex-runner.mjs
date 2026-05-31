@@ -11,6 +11,7 @@ await loadEnvFile(process.env.CODEX_RUNNER_CONFIG || defaultConfig);
 
 const codexBin = process.env.CODEX_BIN || 'codex';
 const workspace = path.resolve(process.env.CODEX_RUNNER_WORKSPACE || path.join(home, 'Documents', 'Codex', 'codex-work'));
+const defaultOutputDir = path.resolve(process.env.CODEX_RUNNER_DEFAULT_OUTPUT_DIR || path.join(workspace, 'tmp_codex'));
 const runsDir = path.resolve(process.env.CODEX_RUNNER_RUNS_DIR || path.join(home, '.openclaw', 'codex-runs'));
 const sandbox = process.env.CODEX_RUNNER_SANDBOX || 'workspace-write';
 const approval = process.env.CODEX_RUNNER_APPROVAL || 'never';
@@ -23,6 +24,7 @@ if (process.argv.includes('--print-config')) {
   console.log(JSON.stringify({
     codexBin,
     workspace,
+    defaultOutputDir,
     runsDir,
     sandbox,
     timeoutSeconds,
@@ -44,6 +46,7 @@ if (!prompt) {
 }
 
 await mkdir(workspace, { recursive: true, mode: 0o755 });
+await mkdir(defaultOutputDir, { recursive: true, mode: 0o700 });
 await mkdir(runsDir, { recursive: true, mode: 0o700 });
 
 const runId = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
@@ -78,7 +81,25 @@ args.push('-');
 log.write(`# OpenClaw Codex Bridge\n`);
 log.write(`# Started: ${new Date().toISOString()}\n`);
 log.write(`# Workspace: ${workspace}\n`);
+log.write(`# Default output dir: ${defaultOutputDir}\n`);
 log.write(`# Command: ${codexBin} ${args.join(' ')}\n\n`);
+
+const codexPrompt = [
+  'You are local Codex called through Feishu/OpenClaw.',
+  `Current Codex workspace: ${workspace}`,
+  `Default output directory: ${defaultOutputDir}`,
+  `Sandbox mode: ${sandbox}`,
+  '',
+  'Execution rules:',
+  '- If the user does not specify a file path, create scripts, temporary files, and generated outputs in the default output directory.',
+  "- Do not write temporary task files into OpenClaw's workspace or OpenClaw's log directory.",
+  '- If the user explicitly asks for a path outside the workspace, try it only when the sandbox allows it; if blocked, use the default output directory and explain briefly.',
+  '- Keep the final answer concise. Say whether the task succeeded, list created files, and include key run output.',
+  '- If a file was successfully written inside the default output directory, do not claim that the sandbox prevented file writing.',
+  '',
+  'User task:',
+  prompt,
+].join('\n');
 
 const child = spawn(codexBin, args, {
   cwd: workspace,
@@ -96,7 +117,7 @@ const timer = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0
 
 child.stdout.pipe(log, { end: false });
 child.stderr.pipe(log, { end: false });
-child.stdin.end(prompt);
+child.stdin.end(codexPrompt);
 
 const result = await new Promise((resolve) => {
   child.on('error', (error) => resolve({ code: 1, error }));

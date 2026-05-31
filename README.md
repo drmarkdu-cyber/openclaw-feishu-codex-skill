@@ -78,6 +78,7 @@ Codex 的最终结果会回到飞书。完整日志保存在：
 
 ```text
 ~/Documents/Codex/codex-work
+~/Documents/Codex/codex-work/tmp_codex
 ```
 
 并写入配置：
@@ -90,16 +91,18 @@ Codex 的最终结果会回到飞书。完整日志保存在：
 
 ```bash
 CODEX_RUNNER_WORKSPACE=$HOME/Documents/Codex/codex-work
+CODEX_RUNNER_DEFAULT_OUTPUT_DIR=$HOME/Documents/Codex/codex-work/tmp_codex
 CODEX_RUNNER_SANDBOX=workspace-write
 CODEX_RUNNER_TIMEOUT_SECONDS=900
 CODEX_RUNNER_SEARCH=false
 CODEX_RUNNER_MODEL=
 ```
 
-如果你想让 `/codex` 默认操作某个项目，改这一行：
+如果你想让 `/codex` 默认操作某个项目，改这两行：
 
 ```bash
 CODEX_RUNNER_WORKSPACE=/path/to/your/project
+CODEX_RUNNER_DEFAULT_OUTPUT_DIR=/path/to/your/project/tmp_codex
 ```
 
 ## 验证
