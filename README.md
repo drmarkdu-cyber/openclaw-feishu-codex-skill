@@ -5,6 +5,7 @@
 ```text
 飞书 -> OpenClaw -> /codex -> 本机 Codex CLI -> OpenClaw -> 飞书
 ```
+尽管 Codex 已经推出手机端，用户可以直接在手机上使用 Codex 执行命令，但仍有一部分用户会受到手机网络环境或设备兼容性的影响，例如部分华为手机无法顺畅使用 Codex 客户端。也有一些用户希望把 OpenClaw 作为统一的输入和输出入口。基于这些需求，我开发了这个 skill，让大家可以通过飞书里的 OpenClaw 间接调用本机 Codex，更方便地完成任务。
 
 适合已经完成「飞书 <-> OpenClaw」连接的人，把 Codex 当作 OpenClaw 的本机执行工具使用。
 
